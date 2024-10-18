@@ -12,8 +12,8 @@ using Store_webAPI.Data;
 namespace Store_webAPI.Migrations
 {
     [DbContext(typeof(UserContext))]
-    [Migration("20241012143218_Store Migration")]
-    partial class StoreMigration
+    [Migration("20241018070121_UserMigration")]
+    partial class UserMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,18 +25,12 @@ namespace Store_webAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Store_webAPI.Entities.User", b =>
+            modelBuilder.Entity("Store_webAPI.Data.Entities.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("Date")
-                        .HasColumnName("CreatedDate");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -48,10 +42,14 @@ namespace Store_webAPI.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Name");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("PasswordHash");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int")
+                        .HasColumnName("Role");
 
                     b.HasKey("Id");
 

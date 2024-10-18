@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Store_webAPI.Entities;
+using Store_webAPI.Data.Entities;
 
 namespace Store_webAPI.Data
 {
