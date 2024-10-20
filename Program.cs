@@ -1,5 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Store_webAPI.Data;
 
 namespace Store_webAPI
@@ -16,9 +17,11 @@ namespace Store_webAPI
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddDbContext<UserContext>(options =>
+            builder.Services.AddDbContext<AppDbContext>(options =>
             {
-                var connectionString = builder.Configuration.GetConnectionString("DbConnection");
+                var databasePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Database", "StoreDatabase.mdf");
+                var connectionString = string.Format("{0} AttachDbFilename={1};",
+                    builder.Configuration.GetConnectionString("DbConnection"), databasePath);
                 options.UseSqlServer(connectionString);
             });
 

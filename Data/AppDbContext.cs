@@ -3,13 +3,15 @@ using Store_webAPI.Data.Entities;
 
 namespace Store_webAPI.Data
 {
-    public class UserContext : DbContext
+    public class AppDbContext : DbContext
     {
-        public UserContext(DbContextOptions<UserContext> dbContextOptions) : base(dbContextOptions)
+        public AppDbContext(DbContextOptions<AppDbContext> dbContextOptions) : base(dbContextOptions)
         {
             
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Product> Products { get; set; }
+
     }
 }

@@ -10,17 +10,17 @@ namespace Store_webAPI.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserContext userContext;
+        private readonly AppDbContext dbContext;
 
-        public UserController(UserContext userContext)
+        public UserController(AppDbContext dbContext)
         {
-            this.userContext = userContext;
+            this.dbContext = dbContext;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<UserDto>> Get()
         {
-            var users = userContext.Users;
+            var users = dbContext.Users;
             
             List<UserDto> result = users.Select(user => new UserDto(
                 user.Id, 
@@ -36,7 +36,7 @@ namespace Store_webAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetById(Guid id)
         {
-            var user = await userContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
+            var user = await dbContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
 
             if (user is null)
             {
@@ -65,8 +65,8 @@ namespace Store_webAPI.Controllers
                 newUser.Role
             ); 
 
-            await userContext.AddAsync(user);
-            await userContext.SaveChangesAsync();
+            await dbContext.AddAsync(user);
+            await dbContext.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
         }
@@ -74,14 +74,14 @@ namespace Store_webAPI.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(Guid id, UpdateUserDto newUser)
         {
-            var userToUpdate = await userContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
+            var userToUpdate = await dbContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
 
             if (userToUpdate is null)
             {
                 return NotFound();
             }
 
-            userContext.Entry(userToUpdate).State = EntityState.Detached;
+            dbContext.Entry(userToUpdate).State = EntityState.Detached;
 
             User user = new User(
                 id, 
@@ -90,9 +90,9 @@ namespace Store_webAPI.Controllers
                 newUser.Password, 
                 newUser.Role
             );
-            userContext.Users.Update(user);
+            dbContext.Users.Update(user);
 
-            await userContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
 
             return NoContent();
         }
@@ -100,14 +100,14 @@ namespace Store_webAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var userById = await userContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
+            var userById = await dbContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
             if (userById is null)
             {
                 return NotFound();
             }
 
-            userContext.Remove(userById);
-            await userContext.SaveChangesAsync();
+            dbContext.Remove(userById);
+            await dbContext.SaveChangesAsync();
 
             return NoContent();
         }

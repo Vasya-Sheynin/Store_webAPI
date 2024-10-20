@@ -28,6 +28,8 @@ namespace Store_webAPI.Data.Entities
         [Column("Role")]
         public UserRole Role { get; init; }
 
+        public virtual IEnumerable<Product> Products { get; init; }
+
         public User(Guid Id, string Name, string Email, string Password, UserRole Role)
         {
             this.Id = Id;
