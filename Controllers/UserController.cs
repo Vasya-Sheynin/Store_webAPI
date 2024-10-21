@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Store_webAPI.Controllers.Dto;
 using Store_webAPI.Data;
 using Store_webAPI.Data.Entities;
 
 namespace Store_webAPI.Controllers
 {
-    [Route("storeApi/[controller]")]
+    [Route("store-api")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -17,7 +18,7 @@ namespace Store_webAPI.Controllers
             this.dbContext = dbContext;
         }
 
-        [HttpGet]
+        [HttpGet("users")]
         public ActionResult<IEnumerable<UserDto>> Get()
         {
             var users = dbContext.Users;
@@ -33,28 +34,28 @@ namespace Store_webAPI.Controllers
             return result;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("users/{id}")]
         public async Task<ActionResult<UserDto>> GetById(Guid id)
         {
-            var user = await dbContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
+            var userToGet = await dbContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
 
-            if (user is null)
+            if (userToGet is null)
             {
                 return NotFound();
             }
 
             var result = new UserDto(
-                user.Id,
-                user.Name,
-                user.Email,
-                user.Password,
-                user.Role
+                userToGet.Id,
+                userToGet.Name,
+                userToGet.Email,
+                userToGet.Password,
+                userToGet.Role
             );
 
             return result;
         }
 
-        [HttpPost]
+        [HttpPost("users")]
         public async Task<ActionResult<UserDto>> Create(CreateUserDto newUser)
         {
             var user = new User(
@@ -71,7 +72,7 @@ namespace Store_webAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("users/{id}")]
         public async Task<ActionResult> Update(Guid id, UpdateUserDto newUser)
         {
             var userToUpdate = await dbContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
@@ -81,23 +82,20 @@ namespace Store_webAPI.Controllers
                 return NotFound();
             }
 
-            dbContext.Entry(userToUpdate).State = EntityState.Detached;
 
-            User user = new User(
-                id, 
-                newUser.Name, 
-                newUser.Email, 
-                newUser.Password, 
-                newUser.Role
-            );
-            dbContext.Users.Update(user);
+            userToUpdate.Id = id;
+            userToUpdate.Name = newUser.Name;
+            userToUpdate.Email = newUser.Email;
+            userToUpdate.Password = newUser.Password;
+            userToUpdate.Role = newUser.Role;
 
+            dbContext.Update(userToUpdate);
             await dbContext.SaveChangesAsync();
 
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("users/{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {
             var userById = await dbContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();

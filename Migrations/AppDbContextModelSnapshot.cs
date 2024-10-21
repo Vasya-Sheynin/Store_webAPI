@@ -47,7 +47,8 @@ namespace Store_webAPI.Migrations
                         .HasColumnName("TimeCreated");
 
                     b.Property<Guid>("UserCreatedId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("UserCreatedId");
 
                     b.HasKey("Id");
 

@@ -12,8 +12,8 @@ using Store_webAPI.Data;
 namespace Store_webAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241020145230_CreateDatabase")]
-    partial class CreateDatabase
+    [Migration("20241021080102_updateProductTable")]
+    partial class updateProductTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,7 +50,8 @@ namespace Store_webAPI.Migrations
                         .HasColumnName("TimeCreated");
 
                     b.Property<Guid>("UserCreatedId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("UserCreatedId");
 
                     b.HasKey("Id");
 
