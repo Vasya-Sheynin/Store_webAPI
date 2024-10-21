@@ -19,16 +19,6 @@ namespace Store_webAPI.Controllers
             this.dbContext = dbContext;
         }
 
-        private bool UserExists(Guid userId)
-        {
-            foreach (var user in dbContext.Users)
-            {
-                if (user.Id == userId) { return true; }
-            }
-
-            return false;
-        }
-
         [HttpGet("products")]
         public ActionResult<IEnumerable<ProductDto>> Get()
         {
@@ -47,7 +37,7 @@ namespace Store_webAPI.Controllers
         }
 
         [HttpGet("products/{id}")]
-        public async Task<ActionResult<ProductDto>> GetById(Guid id)
+        public async Task<ActionResult<ProductDto>> GetById([FromRoute] Guid id)
         {
             var productToGet = await dbContext.Products.Where(product => product.Id == id).SingleOrDefaultAsync();
 
@@ -69,7 +59,7 @@ namespace Store_webAPI.Controllers
         }
 
         [HttpPost("products")]
-        public async Task<ActionResult<ProductDto>> Create(CreateProductDto newProduct)
+        public async Task<ActionResult<ProductDto>> Create([FromBody] CreateProductDto newProduct)
         {
             var product = new Product(
                 Guid.NewGuid(),
@@ -87,11 +77,12 @@ namespace Store_webAPI.Controllers
             }
             catch (Exception ex) { return BadRequest(); }
 
-            return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+            return CreatedAtAction(nameof(GetById), new { id = product.Id }, 
+                new ProductDto(product.Id, product.Name, product.Description, product.Price, product.UserCreatedId, product.TimeCreated));
         }
 
         [HttpPut("products/{id}")]
-        public async Task<ActionResult> Update(Guid id, UpdateProductDto newProduct)
+        public async Task<ActionResult> Update([FromRoute] Guid id,[FromBody] UpdateProductDto newProduct)
         {
             var productToUpdate = await dbContext.Products.Where(product => product.Id == id).SingleOrDefaultAsync();
 
@@ -118,7 +109,7 @@ namespace Store_webAPI.Controllers
         }
 
         [HttpDelete("products/{id}")]
-        public async Task<ActionResult> Delete(Guid id)
+        public async Task<ActionResult> Delete([FromRoute] Guid id)
         {
             var productById = await dbContext.Products.Where(product => product.Id == id).SingleOrDefaultAsync();
             if (productById is null)

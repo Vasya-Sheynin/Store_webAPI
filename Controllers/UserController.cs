@@ -35,7 +35,7 @@ namespace Store_webAPI.Controllers
         }
 
         [HttpGet("users/{id}")]
-        public async Task<ActionResult<UserDto>> GetById(Guid id)
+        public async Task<ActionResult<UserDto>> GetById([FromRoute] Guid id)
         {
             var userToGet = await dbContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
 
@@ -56,7 +56,7 @@ namespace Store_webAPI.Controllers
         }
 
         [HttpPost("users")]
-        public async Task<ActionResult<UserDto>> Create(CreateUserDto newUser)
+        public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserDto newUser)
         {
             var user = new User(
                 Guid.NewGuid(), 
@@ -69,11 +69,12 @@ namespace Store_webAPI.Controllers
             await dbContext.AddAsync(user);
             await dbContext.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetById), new { id = user.Id }, 
+                new UserDto(user.Id, user.Name, user.Email, user.Password, user.Role));
         }
 
         [HttpPut("users/{id}")]
-        public async Task<ActionResult> Update(Guid id, UpdateUserDto newUser)
+        public async Task<ActionResult> Update([FromRoute] Guid id,[FromBody] UpdateUserDto newUser)
         {
             var userToUpdate = await dbContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
 
@@ -96,7 +97,7 @@ namespace Store_webAPI.Controllers
         }
 
         [HttpDelete("users/{id}")]
-        public async Task<ActionResult> Delete(Guid id)
+        public async Task<ActionResult> Delete([FromRoute] Guid id)
         {
             var userById = await dbContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
             if (userById is null)
