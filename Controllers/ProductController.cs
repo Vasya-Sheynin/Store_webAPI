@@ -20,18 +20,24 @@ namespace Store_webAPI.Controllers
         }
 
         [HttpGet("products")]
-        public ActionResult<IEnumerable<ProductDto>> Get()
+        public ActionResult<IEnumerable<ProductDto>> Get(
+             [FromQuery] Guid sellerId, [FromQuery] double minPrice, [FromQuery] double maxPrice = int.MaxValue)
         {
             var products = dbContext.Products;
 
-            List<ProductDto> result = products.Select(product => new ProductDto(
-                product.Id,
-                product.Name,
-                product.Description,
-                product.Price,
-                product.UserCreatedId,
-                product.TimeCreated
-            )).ToList();
+            List<ProductDto> result = products
+                .Where(product => product.Price >= minPrice && product.Price <= maxPrice && 
+                    (sellerId == Guid.Empty || product.UserCreatedId == sellerId))
+                .Select(product => new ProductDto(
+                    product.Id,
+                    product.Name,
+                    product.Description,
+                    product.Price,
+                    product.UserCreatedId,
+                    product.TimeCreated
+                ))
+                .ToList();
+
 
             return result;
         }
