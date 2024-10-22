@@ -8,7 +8,7 @@ namespace Store_webAPI.Controllers.Dto
         Guid Id,
         string Name,
         string Email,
-        string Password,
+        string PasswordHash,
         User.UserRole Role
     );
 

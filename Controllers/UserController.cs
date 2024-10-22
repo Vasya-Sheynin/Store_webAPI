@@ -27,7 +27,7 @@ namespace Store_webAPI.Controllers
                 user.Id, 
                 user.Name,
                 user.Email,
-                user.Password,
+                user.PasswordHash,
                 user.Role
             )).ToList();
 
@@ -48,7 +48,7 @@ namespace Store_webAPI.Controllers
                 userToGet.Id,
                 userToGet.Name,
                 userToGet.Email,
-                userToGet.Password,
+                userToGet.PasswordHash,
                 userToGet.Role
             );
 
@@ -62,7 +62,7 @@ namespace Store_webAPI.Controllers
                 Guid.NewGuid(), 
                 newUser.Name, 
                 newUser.Email, 
-                newUser.Password, 
+                BCrypt.Net.BCrypt.EnhancedHashPassword(newUser.Password), 
                 newUser.Role
             ); 
 
@@ -70,7 +70,7 @@ namespace Store_webAPI.Controllers
             await dbContext.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, 
-                new UserDto(user.Id, user.Name, user.Email, user.Password, user.Role));
+                new UserDto(user.Id, user.Name, user.Email, user.PasswordHash, user.Role));
         }
 
         [HttpPut("users/{id}")]
@@ -87,7 +87,7 @@ namespace Store_webAPI.Controllers
             userToUpdate.Id = id;
             userToUpdate.Name = newUser.Name;
             userToUpdate.Email = newUser.Email;
-            userToUpdate.Password = newUser.Password;
+            userToUpdate.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(newUser.Password);
             userToUpdate.Role = newUser.Role;
 
             dbContext.Update(userToUpdate);

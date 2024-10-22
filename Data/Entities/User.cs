@@ -22,7 +22,7 @@ namespace Store_webAPI.Data.Entities
 
         [Required]
         [Column("PasswordHash")]
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
 
         [Required]
         [Column("Role")]
@@ -30,12 +30,12 @@ namespace Store_webAPI.Data.Entities
 
         public virtual IEnumerable<Product> Products { get; set; }
 
-        public User(Guid Id, string Name, string Email, string Password, UserRole Role)
+        public User(Guid Id, string Name, string Email, string PasswordHash, UserRole Role)
         {
             this.Id = Id;
             this.Name = Name;
             this.Email = Email;
-            this.Password = Password;
+            this.PasswordHash = PasswordHash;
             this.Role = Role;
         }
     }
