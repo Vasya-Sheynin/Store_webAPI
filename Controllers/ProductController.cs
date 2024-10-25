@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Store_webAPI.Controllers.Dto;
 using Store_webAPI.Data;
 using Store_webAPI.Data.Entities;
 using System.Linq;
+using System.Security.Claims;
 
 namespace Store_webAPI.Controllers
 {
-    [Route("store-api")]
+    [Route("store-api")]    
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -19,6 +21,7 @@ namespace Store_webAPI.Controllers
             this.dbContext = dbContext;
         }
 
+        [Authorize(Roles = "Admin, Standard")]
         [HttpGet("products")]
         public ActionResult<IEnumerable<ProductDto>> Get(
              [FromQuery] Guid sellerId, [FromQuery] double minPrice, [FromQuery] double maxPrice = int.MaxValue)
@@ -42,6 +45,7 @@ namespace Store_webAPI.Controllers
             return result;
         }
 
+        [Authorize(Roles = "Admin, Standard")]
         [HttpGet("products/{id}")]
         public async Task<ActionResult<ProductDto>> GetById([FromRoute] Guid id)
         {
@@ -64,15 +68,20 @@ namespace Store_webAPI.Controllers
             return result;
         }
 
+        [Authorize(Roles = "Admin, Standard")]
         [HttpPost("products")]
         public async Task<ActionResult<ProductDto>> Create([FromBody] CreateProductDto newProduct)
         {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var userId = Guid.Parse(identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Uri)?.Value);
+
+
             var product = new Product(
                 Guid.NewGuid(),
                 newProduct.Name,
                 newProduct.Description,
                 newProduct.Price,
-                newProduct.UserCreatedId,
+                userId,
                 DateTime.UtcNow
             );
 
@@ -87,9 +96,13 @@ namespace Store_webAPI.Controllers
                 new ProductDto(product.Id, product.Name, product.Description, product.Price, product.UserCreatedId, product.TimeCreated));
         }
 
+        [Authorize(Roles = "Admin, Standard")]
         [HttpPut("products/{id}")]
         public async Task<ActionResult> Update([FromRoute] Guid id,[FromBody] UpdateProductDto newProduct)
         {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var userId = Guid.Parse(identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Uri)?.Value);
+
             var productToUpdate = await dbContext.Products.Where(product => product.Id == id).SingleOrDefaultAsync();
 
             if (productToUpdate is null)
@@ -97,11 +110,16 @@ namespace Store_webAPI.Controllers
                 return NotFound();
             }
 
+            if (productToUpdate.UserCreatedId != userId)
+            {
+                return Forbid();
+            }
+
             productToUpdate.Id = id;
             productToUpdate.Name = newProduct.Name;
             productToUpdate.Description = newProduct.Description;
             productToUpdate.Price = newProduct.Price;
-            productToUpdate.UserCreatedId = newProduct.UserCreatedId;
+            productToUpdate.UserCreatedId = userId;
             productToUpdate.TimeCreated = DateTime.UtcNow;
 
             try
@@ -114,13 +132,22 @@ namespace Store_webAPI.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin, Standard")]
         [HttpDelete("products/{id}")]
         public async Task<ActionResult> Delete([FromRoute] Guid id)
         {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var userId = Guid.Parse(identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Uri)?.Value);
+
             var productById = await dbContext.Products.Where(product => product.Id == id).SingleOrDefaultAsync();
             if (productById is null)
             {
                 return NotFound();
+            }
+
+            if (productById.UserCreatedId != userId)
+            {
+                return Forbid();
             }
 
             dbContext.Remove(productById);

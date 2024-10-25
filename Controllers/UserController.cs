@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Store_webAPI.Controllers.Dto;
@@ -18,6 +19,7 @@ namespace Store_webAPI.Controllers
             this.dbContext = dbContext;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("users")]
         public ActionResult<IEnumerable<UserDto>> Get()
         {
@@ -34,6 +36,7 @@ namespace Store_webAPI.Controllers
             return result;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("users/{id}")]
         public async Task<ActionResult<UserDto>> GetById([FromRoute] Guid id)
         {
@@ -55,6 +58,7 @@ namespace Store_webAPI.Controllers
             return result;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("users")]
         public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserDto newUser)
         {
@@ -73,6 +77,7 @@ namespace Store_webAPI.Controllers
                 new UserDto(user.Id, user.Name, user.Email, user.PasswordHash, user.Role));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("users/{id}")]
         public async Task<ActionResult> Update([FromRoute] Guid id,[FromBody] UpdateUserDto newUser)
         {
@@ -96,6 +101,7 @@ namespace Store_webAPI.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("users/{id}")]
         public async Task<ActionResult> Delete([FromRoute] Guid id)
         {

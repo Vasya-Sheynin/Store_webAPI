@@ -15,14 +15,12 @@ namespace Store_webAPI.Controllers.Dto
     public record CreateProductDto(
         string Name,
         string? Description,
-        double Price,
-        Guid UserCreatedId
+        double Price
     );
 
     public record UpdateProductDto(
         string Name,
         string? Description,
-        double Price,
-        Guid UserCreatedId
+        double Price
     );
 }

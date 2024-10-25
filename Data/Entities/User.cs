@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Store_webApi.Data;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Store_webAPI.Data.Entities
@@ -6,8 +7,6 @@ namespace Store_webAPI.Data.Entities
     [Table("User")]
     public class User
     {
-        public enum UserRole { BUYER = 1, SELLER };
-
         [Key]
         [Column("Id")]
         public Guid Id { get; set; }
@@ -26,11 +25,11 @@ namespace Store_webAPI.Data.Entities
 
         [Required]
         [Column("Role")]
-        public UserRole Role { get; set; }
+        public SecurityRoles Role { get; set; }
 
         public virtual IEnumerable<Product> Products { get; set; }
 
-        public User(Guid Id, string Name, string Email, string PasswordHash, UserRole Role)
+        public User(Guid Id, string Name, string Email, string PasswordHash, SecurityRoles Role)
         {
             this.Id = Id;
             this.Name = Name;
