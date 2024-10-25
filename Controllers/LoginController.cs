@@ -44,6 +44,11 @@ namespace Store_webApi.Controllers
         [HttpPost("auth/signup")]
         public async Task<ActionResult> Register([FromBody] UserRegisterDto userLogin)
         {
+            if (await Authenticate(new UserLoginDto(userLogin.Name, userLogin.Password)) is not null)
+            {
+                return Conflict("A user with the same name and password already exists."); 
+            }
+
             var user = new User(
                 Guid.NewGuid(),
                 userLogin.Name,
