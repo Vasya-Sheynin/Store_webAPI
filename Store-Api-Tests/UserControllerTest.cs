@@ -23,7 +23,7 @@ namespace Store_Api_Tests
         }
 
         [Fact]
-        public void Test1()
+        public void Test_Get_Returns_Expected_Values()
         {
             // Arrange
             context.Users.AddRange(
