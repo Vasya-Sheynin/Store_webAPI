@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Store_webAPI.Migrations
+namespace Store_Api.Migrations
 {
     /// <inheritdoc />
-    public partial class updateProductTable : Migration
+    public partial class UpdateDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

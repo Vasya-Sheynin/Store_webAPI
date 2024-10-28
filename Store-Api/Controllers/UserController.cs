@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Store_webAPI.Controllers.Dto;
-using Store_webAPI.Data;
-using Store_webAPI.Data.Entities;
+using Store_Api.Data;
+using Store_Api.Controllers.Dto;
+using Store_Api.Data.Entities;
 
-namespace Store_webAPI.Controllers
+namespace Store_Api.Controllers
 {
     [Route("store-api")]
     [ApiController]
@@ -24,9 +24,9 @@ namespace Store_webAPI.Controllers
         public ActionResult<IEnumerable<UserDto>> Get()
         {
             var users = dbContext.Users;
-            
+
             List<UserDto> result = users.Select(user => new UserDto(
-                user.Id, 
+                user.Id,
                 user.Name,
                 user.Email,
                 user.PasswordHash,
@@ -63,23 +63,23 @@ namespace Store_webAPI.Controllers
         public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserDto newUser)
         {
             var user = new User(
-                Guid.NewGuid(), 
-                newUser.Name, 
-                newUser.Email, 
-                BCrypt.Net.BCrypt.EnhancedHashPassword(newUser.Password), 
+                Guid.NewGuid(),
+                newUser.Name,
+                newUser.Email,
+                BCrypt.Net.BCrypt.EnhancedHashPassword(newUser.Password),
                 newUser.Role
-            ); 
+            );
 
             await dbContext.AddAsync(user);
             await dbContext.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = user.Id }, 
+            return CreatedAtAction(nameof(GetById), new { id = user.Id },
                 new UserDto(user.Id, user.Name, user.Email, user.PasswordHash, user.Role));
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("users/{id}")]
-        public async Task<ActionResult> Update([FromRoute] Guid id,[FromBody] UpdateUserDto newUser)
+        public async Task<ActionResult> Update([FromRoute] Guid id, [FromBody] UpdateUserDto newUser)
         {
             var userToUpdate = await dbContext.Users.Where(user => user.Id == id).SingleOrDefaultAsync();
 

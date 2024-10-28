@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Store_webAPI.Controllers.Dto;
-using Store_webAPI.Data;
-using Store_webAPI.Data.Entities;
+using Store_Api.Data;
+using Store_Api.Controllers.Dto;
+using Store_Api.Data.Entities;
 using System.Linq;
 using System.Security.Claims;
 
-namespace Store_webAPI.Controllers
+namespace Store_Api.Controllers
 {
-    [Route("store-api")]    
+    [Route("store-api")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -29,7 +29,7 @@ namespace Store_webAPI.Controllers
             var products = dbContext.Products;
 
             List<ProductDto> result = products
-                .Where(product => product.Price >= minPrice && product.Price <= maxPrice && 
+                .Where(product => product.Price >= minPrice && product.Price <= maxPrice &&
                     (sellerId == Guid.Empty || product.UserCreatedId == sellerId))
                 .Select(product => new ProductDto(
                     product.Id,
@@ -92,13 +92,13 @@ namespace Store_webAPI.Controllers
             }
             catch (Exception ex) { return BadRequest(); }
 
-            return CreatedAtAction(nameof(GetById), new { id = product.Id }, 
+            return CreatedAtAction(nameof(GetById), new { id = product.Id },
                 new ProductDto(product.Id, product.Name, product.Description, product.Price, product.UserCreatedId, product.TimeCreated));
         }
 
         [Authorize(Roles = "Admin, Standard")]
         [HttpPut("products/{id}")]
-        public async Task<ActionResult> Update([FromRoute] Guid id,[FromBody] UpdateProductDto newProduct)
+        public async Task<ActionResult> Update([FromRoute] Guid id, [FromBody] UpdateProductDto newProduct)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var userId = Guid.Parse(identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Uri)?.Value);

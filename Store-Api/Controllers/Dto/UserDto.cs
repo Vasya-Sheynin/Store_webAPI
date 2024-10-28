@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Store_webApi.Data;
-using Store_webAPI.Data.Entities;
+using Store_Api.Data;
+using Store_Api.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 
-namespace Store_webAPI.Controllers.Dto
+namespace Store_Api.Controllers.Dto
 {
     public record UserDto(
         Guid Id,

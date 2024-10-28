@@ -1,13 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Store_webAPI.Data.Entities;
+using Store_Api.Data.Entities;
 
-namespace Store_webAPI.Data
+namespace Store_Api.Data
 {
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> dbContextOptions) : base(dbContextOptions)
         {
-            
         }
 
         public DbSet<User> Users { get; set; }

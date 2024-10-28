@@ -2,14 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Store_webApi.Controllers.Dto;
-using Store_webAPI.Data;
-using Store_webAPI.Data.Entities;
+using Store_Api.Data;
+using Store_Api.Controllers.Dto;
+using Store_Api.Data.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Store_webApi.Controllers
+namespace Store_Api.Controllers
 {
     [Route("store-api")]
     [ApiController]
@@ -46,7 +46,7 @@ namespace Store_webApi.Controllers
         {
             if (await Authenticate(new UserLoginDto(userLogin.Name, userLogin.Password)) is not null)
             {
-                return Conflict("A user with the same name and password already exists."); 
+                return Conflict("A user with the same name and password already exists.");
             }
 
             var user = new User(
@@ -75,7 +75,7 @@ namespace Store_webApi.Controllers
                 new Claim(ClaimTypes.Uri, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.ToString())            
+                new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             var token = new JwtSecurityToken(
@@ -96,7 +96,7 @@ namespace Store_webApi.Controllers
                 .ToListAsync();
 
             foreach (var user in users)
-            { 
+            {
                 if (BCrypt.Net.BCrypt.EnhancedVerify(userLogin.Password, user.PasswordHash))
                 {
                     return user;

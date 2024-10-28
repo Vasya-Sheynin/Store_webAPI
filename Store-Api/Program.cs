@@ -1,12 +1,11 @@
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Store_webAPI.Data;
+using Store_Api.Data;
 using System.Text;
 
-namespace Store_webAPI
+namespace Store_Api
 {
     public class Program
     {
@@ -21,7 +20,7 @@ namespace Store_webAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Store_WebApi", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Store_Api", Version = "v1" });
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,

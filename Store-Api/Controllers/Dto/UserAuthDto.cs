@@ -1,7 +1,7 @@
-﻿namespace Store_webApi.Controllers.Dto
+﻿namespace Store_Api.Controllers.Dto
 {
     public record UserLoginDto(
-        string Name, 
+        string Name,
         string Password
     );
 

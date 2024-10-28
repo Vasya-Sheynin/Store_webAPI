@@ -4,9 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>9e729a8a-788c-4fbc-8c06-10626f23b550</UserSecretsId>
+    <RootNamespace>Store_Api</RootNamespace>
+    <UserSecretsId>7f1ff156-bb22-490a-a2ed-d9cfbe300f3a</UserSecretsId>
     <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
-    <DockerfileContext>.</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,8 +25,6 @@
 
   <ItemGroup>
     <Folder Include="Data\Database\" />
-    <Folder Include="Migrations\" />
-    <Folder Include="Tests\" />
   </ItemGroup>
 
 </Project>

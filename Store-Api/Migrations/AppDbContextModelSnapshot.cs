@@ -3,20 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Store_webAPI.Data;
+using Store_Api.Data;
 
 #nullable disable
 
-namespace Store_webAPI.Migrations
+namespace Store_Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241022065944_UserTablePasswordHash")]
-    partial class UserTablePasswordHash
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,7 +22,7 @@ namespace Store_webAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Store_webAPI.Data.Entities.Product", b =>
+            modelBuilder.Entity("Store_Api.Data.Entities.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,7 +57,7 @@ namespace Store_webAPI.Migrations
                     b.ToTable("Product");
                 });
 
-            modelBuilder.Entity("Store_webAPI.Data.Entities.User", b =>
+            modelBuilder.Entity("Store_Api.Data.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,9 +88,9 @@ namespace Store_webAPI.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("Store_webAPI.Data.Entities.Product", b =>
+            modelBuilder.Entity("Store_Api.Data.Entities.Product", b =>
                 {
-                    b.HasOne("Store_webAPI.Data.Entities.User", "UserCreated")
+                    b.HasOne("Store_Api.Data.Entities.User", "UserCreated")
                         .WithMany("Products")
                         .HasForeignKey("UserCreatedId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -102,7 +99,7 @@ namespace Store_webAPI.Migrations
                     b.Navigation("UserCreated");
                 });
 
-            modelBuilder.Entity("Store_webAPI.Data.Entities.User", b =>
+            modelBuilder.Entity("Store_Api.Data.Entities.User", b =>
                 {
                     b.Navigation("Products");
                 });

@@ -1,7 +1,4 @@
-﻿using Store_webAPI.Data.Entities;
-using System.ComponentModel.DataAnnotations;
-
-namespace Store_webAPI.Controllers.Dto
+﻿namespace Store_Api.Controllers.Dto
 {
     public record ProductDto(
         Guid Id,
