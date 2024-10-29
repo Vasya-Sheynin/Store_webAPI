@@ -15,7 +15,7 @@ namespace Store_Api_Tests
         public UserControllerTest()
         {
             options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase")
+                .UseInMemoryDatabase(databaseName: "UserControllerTestDatabase")
                 .Options;
         }
 

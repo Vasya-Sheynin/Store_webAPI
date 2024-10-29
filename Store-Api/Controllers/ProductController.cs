@@ -24,7 +24,7 @@ namespace Store_Api.Controllers
         [Authorize(Roles = "Admin, Standard")]
         [HttpGet("products")]
         public ActionResult<IEnumerable<ProductDto>> Get(
-             [FromQuery] Guid sellerId, [FromQuery] double minPrice, [FromQuery] double maxPrice = int.MaxValue)
+             [FromQuery] Guid sellerId, [FromQuery] double minPrice = 0.0, [FromQuery] double maxPrice = int.MaxValue)
         {
             var products = dbContext.Products;
 
