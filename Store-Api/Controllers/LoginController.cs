@@ -54,7 +54,7 @@ namespace Store_Api.Controllers
                 userLogin.Name,
                 userLogin.Email,
                 BCrypt.Net.BCrypt.EnhancedHashPassword(userLogin.Password),
-                Data.SecurityRoles.Standard
+                SecurityRoles.Standard
             );
 
             await dbContext.AddAsync(user);
