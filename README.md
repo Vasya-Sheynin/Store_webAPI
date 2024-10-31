@@ -6,6 +6,7 @@
 * Systems of authentication and role-based authorization are supported, therefore only authorized users have access to controllers. Moreover, access is restricted based on user's role. Only admin can manage users' accounts, users can modify only those products which they have created;
 * There is a Unit testing available for all controllers;
 * Followed principles of MVC architectural pattern;
+* Swagger UI is used to enhance visual representation;
 
 ### Used Technologies
 * ASP.NET Core;
