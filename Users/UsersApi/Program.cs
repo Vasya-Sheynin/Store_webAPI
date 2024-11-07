@@ -3,8 +3,10 @@ using CommonModules.Persistence.Extensions;
 using Infrastructure.Auth;
 using Users.Application.ServiceInterfaces;
 using Users.Application.Services;
+using Users.Infrastructure.Auth;
 using Users.Infrastructure.Auth.Extensions;
 using Users.Infrastructure.Persistence.Repositories;
+using Users.Application.Validation.Extensions;
 
 namespace Users.UsersApi
 {
@@ -22,10 +24,13 @@ namespace Users.UsersApi
             builder.Services.AddSwaggerAuth();
 
             builder.Services.AddAuth(builder.Configuration);
+
             builder.Services.AddPersistence(builder.Configuration);
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IUserRepository, UserRepository>();
             builder.Services.AddTransient<IAuthentication, Authentication>();
+
+            builder.Services.AddValidation();
 
             var app = builder.Build();
 

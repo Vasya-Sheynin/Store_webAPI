@@ -1,21 +1,20 @@
 ﻿using Users.Application.ServiceInterfaces;
 using CommonModules.Domain.Entities;
 using CommonModules.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MediatR;
+using Users.Application.Validation.Commands;
 
 namespace Users.Application.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepository userRepository; 
+        private readonly IUserRepository userRepository;
+        private readonly ISender sender;
 
-        public UserService(IUserRepository repository)
+        public UserService(IUserRepository repository, ISender s)
         {
             userRepository = repository;
+            sender = s;
         }
 
         public async Task DeleteUserAsync(Guid id)
@@ -46,6 +45,8 @@ namespace Users.Application.Services
 
         public async Task<UserDto> InsertUserAsync(CreateUserDto userDto)
         {
+            await sender.Send(new ValidateUserInsertCommand(userDto));
+
             var newUser = new User(
                 Guid.NewGuid(),
                 userDto.Name,
@@ -63,6 +64,8 @@ namespace Users.Application.Services
 
         public async Task UpdateUserAsync(Guid id, UpdateUserDto userDto)
         {
+            await sender.Send(new ValidateUserUpdateCommand(userDto));
+
             var user = await userRepository.GetUserByIdAsync(id);
 
             user.Id = id;

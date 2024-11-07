@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,23 +8,23 @@ using System.Threading.Tasks;
 namespace Products.Application
 {
     public record ProductDto(
-        Guid Id,
-        string Name,
+        [Required] Guid Id,
+        [Required] string Name,
         string? Description,
-        double Price,
-        Guid UserCreatedId,
-        DateTime TimeCreated
+        [Required] double Price,
+        [Required] Guid UserCreatedId,
+        [Required] DateTime TimeCreated
     );
 
     public record CreateProductDto(
-        string Name,
+        [Required] string Name,
         string? Description,
-        double Price
+        [Required] double Price
     );
 
     public record UpdateProductDto(
-        string Name,
+        [Required] string Name,
         string? Description,
-        double Price
+        [Required] double Price
     );
 }

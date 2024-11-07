@@ -4,6 +4,7 @@ using Products.Application.Services;
 using Products.Infrastructure.Persistence.Repositories;
 using Products.Infrastructure.Auth.Extensions;
 using Products.Infrastructure.Persistence.Extensions;
+using Products.Application.Validation.Extensions;
 
 namespace Products.ProductsApi
 {
@@ -26,6 +27,8 @@ namespace Products.ProductsApi
 
             builder.Services.AddTransient<IProductService, ProductService>();
             builder.Services.AddTransient<IProductRepository, ProductRepository>();
+
+            builder.Services.AddValidation();
 
             var app = builder.Build();
 

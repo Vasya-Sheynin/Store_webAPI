@@ -1,5 +1,7 @@
 ﻿using CommonModules.Domain.Entities;
 using CommonModules.Domain.Interfaces;
+using Infrastructure.Auth;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -10,22 +12,27 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Users.Application;
+using Users.Application.Validation.Commands;
 
-namespace Infrastructure.Auth
+namespace Users.Infrastructure.Auth
 {
     public class Authentication : IAuthentication
     {
         private readonly IUserRepository userRepository;
         private readonly IConfiguration configManager;
+        private readonly ISender sender;
 
-        public Authentication(IUserRepository repository, IConfiguration config)
+        public Authentication(IUserRepository repository, IConfiguration config, ISender s)
         {
             userRepository = repository;
             configManager = config;
+            sender = s;
         }
 
         public async Task<string> LoginAsync(UserLoginDto userLogin)
         {
+            await sender.Send(new ValidateUserLoginCommand(userLogin));
+
             var user = await Authenticate(userLogin);
             string token = string.Empty;
 
@@ -39,6 +46,8 @@ namespace Infrastructure.Auth
 
         public async Task<string> RegisterAsync(UserRegisterDto userRegister)
         {
+            await sender.Send(new ValidateUserRegisterCommand(userRegister));
+
             if (await Authenticate(new UserLoginDto(userRegister.Name, userRegister.Password)) is not null)
             {
                 //TODO: 

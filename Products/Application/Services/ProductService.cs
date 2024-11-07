@@ -1,7 +1,9 @@
 ﻿using CommonModules.Domain.Entities;
 using CommonModules.Domain.Interfaces;
+using MediatR;
 using Products.Application.Filters;
 using Products.Application.ServiceInterfaces;
+using Products.Application.Validation.Commands;
 
 
 namespace Products.Application.Services
@@ -9,10 +11,12 @@ namespace Products.Application.Services
     public class ProductService : IProductService
     {
         private readonly IProductRepository productRepository;
+        private readonly ISender sender;
 
-        public ProductService(IProductRepository repository)
+        public ProductService(IProductRepository repository, ISender s)
         {
             productRepository = repository;
+            sender = s;
         }
 
         public async Task DeleteProductAsync(Guid id, Guid userId)
@@ -22,6 +26,8 @@ namespace Products.Application.Services
 
         public async Task<IEnumerable<ProductDto>> GetFilteredProductsAsync(Filter filter)
         {
+            await sender.Send(new ValidateFilterCommand(filter));
+
             var products = (await GetProductsAsync()).Where(product =>
                     product.Price >= filter.MinPrice && 
                     product.Price <= filter.MaxPrice && 
@@ -62,6 +68,8 @@ namespace Products.Application.Services
 
         public async Task<ProductDto> InsertProductAsync(CreateProductDto product, Guid userId)
         {
+            await sender.Send(new ValidateProductInsertCommand(product));
+
             var newProduct = new Product(
                 Guid.NewGuid(),
                 product.Name,
@@ -87,6 +95,8 @@ namespace Products.Application.Services
 
         public async Task UpdateProductAsync(Guid id, UpdateProductDto product, Guid userId)
         {
+            await sender.Send(new ValidateProductUpdateCommand(product));
+
             var productToUpdate = await productRepository.GetProductByIdAsync(id);
 
             productToUpdate.Name = product.Name;

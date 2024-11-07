@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 namespace Users.Application
 {
     public record UserDto(
-        Guid Id,
-        string Name,
-        string Email,
-        string PasswordHash,
-        SecurityRoles Role
+        [Required] Guid Id,
+        [Required] string Name,
+        [Required] string Email,
+        [Required] string PasswordHash,
+        [Range(0, 1)] SecurityRoles Role
     );
 
     public record CreateUserDto(
@@ -31,13 +31,13 @@ namespace Users.Application
     );
 
     public record UserLoginDto(
-        string Name,
-        string Password
+        [Required] string Name,
+        [Required] string Password
     );
 
     public record UserRegisterDto(
-        string Name,
-        string Password,
-        string Email
+        [Required] string Name,
+        [Required] string Password,
+        [Required] string Email
     );
 }
