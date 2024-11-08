@@ -3,6 +3,7 @@ using CommonModules.Domain.Entities;
 using CommonModules.Domain.Interfaces;
 using MediatR;
 using Users.Application.Validation.Commands;
+using Users.Application.Exceptions;
 
 namespace Users.Application.Services
 {
@@ -19,11 +20,23 @@ namespace Users.Application.Services
 
         public async Task DeleteUserAsync(Guid id)
         {
+            var userById = await userRepository.GetUserByIdAsync(id);
+            if (userById is null)
+            {
+                throw new UserNotFoundException("UserService");
+            }
+
             await userRepository.DeleteUserAsync(id);
         }
 
         public async Task<UserDto> GetUserByIdAsync(Guid id)
         {
+            var userById = await userRepository.GetUserByIdAsync(id);
+            if (userById is null)
+            {
+                throw new UserNotFoundException("UserService");
+            }
+
             var user = await userRepository.GetUserByIdAsync(id);
             var userDto = new UserDto(user.Id, user.Name, user.Email, user.PasswordHash, user.Role);
 
@@ -65,6 +78,12 @@ namespace Users.Application.Services
         public async Task UpdateUserAsync(Guid id, UpdateUserDto userDto)
         {
             await sender.Send(new ValidateUserUpdateCommand(userDto));
+
+            var userById = await userRepository.GetUserByIdAsync(id);
+            if (userById is null)
+            {
+                throw new UserNotFoundException("UserService");
+            }
 
             var user = await userRepository.GetUserByIdAsync(id);
 

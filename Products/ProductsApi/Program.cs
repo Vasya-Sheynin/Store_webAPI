@@ -5,6 +5,8 @@ using Products.Infrastructure.Persistence.Repositories;
 using Products.Infrastructure.Auth.Extensions;
 using Products.Infrastructure.Persistence.Extensions;
 using Products.Application.Validation.Extensions;
+using Hellang.Middleware.ProblemDetails;
+using Products.Application.Extensions;
 
 namespace Products.ProductsApi
 {
@@ -30,6 +32,8 @@ namespace Products.ProductsApi
 
             builder.Services.AddValidation();
 
+            builder.Services.AddExceptionHandling(builder.Environment);
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -38,6 +42,8 @@ namespace Products.ProductsApi
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseProblemDetails();
 
             app.UseHttpsRedirection();
 

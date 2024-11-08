@@ -4,7 +4,7 @@ using MediatR;
 using Products.Application.Filters;
 using Products.Application.ServiceInterfaces;
 using Products.Application.Validation.Commands;
-
+using Products.Application.Exceptions;
 
 namespace Products.Application.Services
 {
@@ -21,6 +21,17 @@ namespace Products.Application.Services
 
         public async Task DeleteProductAsync(Guid id, Guid userId)
         {
+            var productById = await productRepository.GetProductByIdAsync(id);
+            if (productById is null)
+            {
+                throw new ProductNotFoundException("ProductService");
+            }
+
+            if (productById.UserCreatedId != userId)
+            {
+                throw new NoAccessException("ProductService");
+            }
+
             await productRepository.DeleteProductAsync(id);
         }
 
@@ -40,6 +51,12 @@ namespace Products.Application.Services
         public async Task<ProductDto> GetProductByIdAsync(Guid id)
         {
             var product = await productRepository.GetProductByIdAsync(id);
+
+            if (product is null)
+            {
+                throw new ProductNotFoundException("ProductService");
+            }
+
             var productDto = new ProductDto(
                 product.Id, 
                 product.Name, 
@@ -98,6 +115,16 @@ namespace Products.Application.Services
             await sender.Send(new ValidateProductUpdateCommand(product));
 
             var productToUpdate = await productRepository.GetProductByIdAsync(id);
+
+            if (productToUpdate is null)
+            {
+                throw new ProductNotFoundException("ProductService");
+            }
+
+            if (productToUpdate.UserCreatedId != userId)
+            {
+                throw new NoAccessException("ProductService");
+            }
 
             productToUpdate.Name = product.Name;
             productToUpdate.Description = product.Description;

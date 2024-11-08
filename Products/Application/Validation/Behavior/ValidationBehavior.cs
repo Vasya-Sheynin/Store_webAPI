@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
+using Products.Application.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace Products.Application.Validation.Behavior
 
             if (errors.Any())
             {
-                throw new ValidationException(errors);
+                throw new ProductValidationException(errors);
             }
 
             return await next();

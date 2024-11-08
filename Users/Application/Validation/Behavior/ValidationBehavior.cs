@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Users.Application.Exceptions;
 
 namespace Users.Application.Validation.Behavior
 {
@@ -35,7 +36,7 @@ namespace Users.Application.Validation.Behavior
 
             if (errors.Any())
             {
-                throw new ValidationException(errors);
+                throw new UserValidationException(errors);
             }
 
             return await next();

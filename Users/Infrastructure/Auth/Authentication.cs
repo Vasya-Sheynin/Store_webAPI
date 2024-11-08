@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Users.Application;
+using Users.Application.Exceptions;
 using Users.Application.Validation.Commands;
 
 namespace Users.Infrastructure.Auth
@@ -40,6 +41,10 @@ namespace Users.Infrastructure.Auth
             {
                 token = GenerateToken(user);
             }
+            else
+            {
+                throw new UserNotFoundException("Authentication");
+            }
 
             return token;
         }
@@ -50,7 +55,7 @@ namespace Users.Infrastructure.Auth
 
             if (await Authenticate(new UserLoginDto(userRegister.Name, userRegister.Password)) is not null)
             {
-                //TODO: 
+                throw new UserAlreadyExistsException("Authentication");
             }
 
             var user = new User(
