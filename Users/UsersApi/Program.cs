@@ -9,6 +9,7 @@ using Users.Infrastructure.Persistence.Repositories;
 using Users.Application.Validation.Extensions;
 using Hellang.Middleware.ProblemDetails;
 using Users.Application.Extensions;
+using Users.Infrastructure.Email; 
 
 namespace Users.UsersApi
 {
@@ -35,6 +36,13 @@ namespace Users.UsersApi
             builder.Services.AddValidation();
 
             builder.Services.AddExceptionHandling(builder.Environment);
+
+
+            var emailConfig = builder.Configuration
+                .GetSection("EmailConfiguration")
+                .Get<EmailConfig>();
+            builder.Services.AddSingleton(emailConfig);
+            builder.Services.AddScoped<IEmailSender, EmailSender>();
 
             var app = builder.Build();
 

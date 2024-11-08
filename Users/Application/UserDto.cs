@@ -40,4 +40,9 @@ namespace Users.Application
         [Required] string Password,
         [Required] string Email
     );
+
+    public record UserRecoveryDto(
+    [Required] string Name,
+    [Required] string Email
+);
 }

@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Users.Application;
 
 namespace Users.Application.Validation.Commands
 {
-    public record ValidateUserLoginCommand(UserLoginDto userLoginDto) : IRequest;
+    public record ValidateUserRecoveryCommand(UserRecoveryDto userRecoveryDto) : IRequest;
 }

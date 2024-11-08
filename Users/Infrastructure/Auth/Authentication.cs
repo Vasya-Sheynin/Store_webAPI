@@ -4,13 +4,9 @@ using Infrastructure.Auth;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using Users.Application;
 using Users.Application.Exceptions;
 using Users.Application.Validation.Commands;
@@ -53,7 +49,8 @@ namespace Users.Infrastructure.Auth
         {
             await sender.Send(new ValidateUserRegisterCommand(userRegister));
 
-            if (await Authenticate(new UserLoginDto(userRegister.Name, userRegister.Password)) is not null)
+            var u = (await userRepository.GetUsersAsync()).FirstOrDefault(i => i.Name  == userRegister.Name);
+            if (u is not null)
             {
                 throw new UserAlreadyExistsException("Authentication");
             }

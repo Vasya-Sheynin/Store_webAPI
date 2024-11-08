@@ -4,6 +4,7 @@ using CommonModules.Domain.Interfaces;
 using MediatR;
 using Users.Application.Validation.Commands;
 using Users.Application.Exceptions;
+using System.Text;
 
 namespace Users.Application.Services
 {
@@ -94,6 +95,38 @@ namespace Users.Application.Services
             user.Role = userDto.Role;
 
             await userRepository.UpdateUserAsync(user);
+        }
+
+        public async Task<string> SetDefaultPasswordAsync(UserRecoveryDto userDto)
+        {
+            await sender.Send(new ValidateUserRecoveryCommand(userDto));
+
+            var user = (await userRepository.GetUsersAsync()).FirstOrDefault(u => u.Name == userDto.Name);
+            if (user is null)
+            {
+                throw new UserNotFoundException("UserService");
+            }
+
+            var newPassword = GenerateRandomAlphanumericString(6);
+            user.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(newPassword);
+
+            await userRepository.UpdateUserAsync(user);
+
+            return newPassword;
+        }
+
+        private string GenerateRandomAlphanumericString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            var result = new StringBuilder();
+
+            for (int i = 0; i < length; i++)
+            {
+                result.Append(chars[random.Next(chars.Length)]);
+            }
+
+            return result.ToString();
         }
     }
 }

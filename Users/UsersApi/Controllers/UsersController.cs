@@ -2,11 +2,13 @@
 using Infrastructure.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using Users.Application;
 using Users.Application.ServiceInterfaces;
+using Users.Infrastructure.Email;
 
 namespace Users.UsersApi.Controllers
 {
@@ -16,11 +18,15 @@ namespace Users.UsersApi.Controllers
     {
         private readonly IUserService userService;
         private readonly IAuthentication authentication;
+        private readonly Infrastructure.Email.IEmailSender emailSender;
+        private readonly EmailConfig emailConfig;
 
-        public UsersController(IUserService service, IAuthentication auth)
+        public UsersController(IUserService service, IAuthentication auth, Infrastructure.Email.IEmailSender sender, EmailConfig config)
         {
             userService = service;
             authentication = auth;
+            emailSender = sender;
+            emailConfig = config;
         }
 
         [AllowAnonymous]
@@ -39,6 +45,18 @@ namespace Users.UsersApi.Controllers
             var token = await authentication.RegisterAsync(userRegister);
 
             return Ok(token);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("auth/recovery")]
+        public async Task<ActionResult> RecoverPasswordForAccount([FromBody] UserRecoveryDto userRecovery)
+        {
+            var newPassword = await userService.SetDefaultPasswordAsync(userRecovery);
+
+            var message = new Message(emailConfig.From, "Password recovery", $"Password for account {userRecovery.Name} has been set to {newPassword}");
+            emailSender.SendEmail(message);
+
+            return NoContent();
         }
 
         [Authorize(Roles = "Admin")]

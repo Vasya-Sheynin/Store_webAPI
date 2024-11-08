@@ -14,5 +14,6 @@ namespace Users.Application.ServiceInterfaces
         Task<UserDto> InsertUserAsync(CreateUserDto user);
         Task DeleteUserAsync(Guid id);
         Task UpdateUserAsync(Guid id, UpdateUserDto user);
+        Task<string> SetDefaultPasswordAsync(UserRecoveryDto userDto);
     }
 }
