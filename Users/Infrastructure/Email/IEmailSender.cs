@@ -8,6 +8,6 @@ namespace Users.Infrastructure.Email
 {
     public interface IEmailSender
     {
-        public void SendEmail(Message message);
+        public Task SendEmail(Message message);
     }
 }

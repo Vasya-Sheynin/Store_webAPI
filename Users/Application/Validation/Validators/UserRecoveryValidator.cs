@@ -23,6 +23,16 @@ namespace Users.Application.Validation.Validators
                     }
                 });
 
+            RuleFor(u => u.userRecoveryDto.NewPassword)
+                .Custom((password, context) =>
+                {
+                    var regex = new Regex("^[a-zA-Z0-9]+$");
+                    if (!regex.IsMatch(password))
+                    {
+                        context.AddFailure("Password must contain only letters and numbers.");
+                    }
+                });
+
             RuleFor(u => u.userRecoveryDto.Email)
                 .Custom((email, context) =>
                 {

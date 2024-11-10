@@ -42,7 +42,8 @@ namespace Users.Application
     );
 
     public record UserRecoveryDto(
-    [Required] string Name,
-    [Required] string Email
-);
+        [Required] string Name,
+        [Required] string NewPassword,
+        [Required] string Email
+    );
 }

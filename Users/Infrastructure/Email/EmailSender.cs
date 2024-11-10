@@ -18,10 +18,10 @@ namespace Users.Infrastructure.Email
             emailConfig = config;
         }
 
-        public void SendEmail(Message message)
+        public async Task SendEmail(Message message)
         {
             var emailMessage = CreateEmailMessage(message);
-            Send(emailMessage);
+            await Send(emailMessage);
         }
 
         private MimeMessage CreateEmailMessage(Message message)
@@ -30,20 +30,20 @@ namespace Users.Infrastructure.Email
             emailMessage.From.Add(MailboxAddress.Parse(emailConfig.From));
             emailMessage.To.Add(message.To);
             emailMessage.Subject = message.Subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = message.Content };
             return emailMessage;
         }
 
-        private void Send(MimeMessage mailMessage)
+        private async Task Send(MimeMessage mailMessage)
         {
             using (var client = new SmtpClient())
             {
                 try
                 {
-                    client.Connect(emailConfig.SmtpServer, emailConfig.Port, true);
+                    await client.ConnectAsync(emailConfig.SmtpServer, emailConfig.Port, true);
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
-                    client.Authenticate(emailConfig.UserName, emailConfig.Password);
-                    client.Send(mailMessage);
+                    await client.AuthenticateAsync(emailConfig.UserName, emailConfig.Password);
+                    await client.SendAsync(mailMessage);
                 }
                 catch
                 {
@@ -52,7 +52,7 @@ namespace Users.Infrastructure.Email
                 }
                 finally
                 {
-                    client.Disconnect(true);
+                    await client.DisconnectAsync(true);
                     client.Dispose();
                 }
             }

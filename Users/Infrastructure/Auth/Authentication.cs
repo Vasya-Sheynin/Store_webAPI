@@ -35,7 +35,7 @@ namespace Users.Infrastructure.Auth
 
             if (user is not null)
             {
-                token = GenerateToken(user);
+                token = GenerateToken(user, 60);
             }
             else
             {
@@ -49,7 +49,7 @@ namespace Users.Infrastructure.Auth
         {
             await sender.Send(new ValidateUserRegisterCommand(userRegister));
 
-            var u = (await userRepository.GetUsersAsync()).FirstOrDefault(i => i.Name  == userRegister.Name);
+            var u = (await userRepository.GetUsersAsync()).FirstOrDefault(i => i.Name == userRegister.Name);
             if (u is not null)
             {
                 throw new UserAlreadyExistsException("Authentication");
@@ -65,12 +65,12 @@ namespace Users.Infrastructure.Auth
 
             await userRepository.InsertUserAsync(user);
 
-            var token = GenerateToken(user);
+            var token = GenerateToken(user, 60);
 
             return token;
         }
 
-        private string GenerateToken(User user)
+        private string GenerateToken(User user, int duration)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configManager.GetSection("Jwt")["Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -87,7 +87,7 @@ namespace Users.Infrastructure.Auth
                 configManager.GetSection("Jwt")["Issuer"],
                 configManager.GetSection("Jwt")["Audience"],
                 claims,
-                expires: DateTime.Now.AddMinutes(60),
+                expires: DateTime.Now.AddMinutes(duration),
                 signingCredentials: credentials
             );
 
@@ -109,6 +109,41 @@ namespace Users.Infrastructure.Auth
             }
 
             return null;
+        }
+
+        public async Task<string> GenerateRecoveryTokenAsync(UserRecoveryDto user)
+        {
+            await sender.Send(new ValidateUserRecoveryCommand(user));
+
+            var userToRecover = (await userRepository.GetUsersAsync()).FirstOrDefault(u => u.Name == user.Name);
+
+            if (userToRecover == null)
+            {
+                throw new UserNotFoundException("Authentication");
+            }
+
+            string recoveryToken = GenerateToken(userToRecover, 5);
+
+            return recoveryToken;
+        }
+
+        public async Task<string> RecoverAsync(Guid userId, string newPassword)
+        {
+            var user = await userRepository.GetUserByIdAsync(userId);
+            user.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(newPassword);
+            await userRepository.UpdateUserAsync(user);
+
+            return GenerateToken(user, 60);
+        }
+
+        public Claim[] ParseToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadJwtToken(token);
+
+            var claims = jsonToken.Claims.ToArray();
+
+            return claims;
         }
     }
 }

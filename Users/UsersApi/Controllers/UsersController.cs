@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading;
 using Users.Application;
 using Users.Application.ServiceInterfaces;
@@ -48,15 +50,26 @@ namespace Users.UsersApi.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("auth/recovery")]
-        public async Task<ActionResult> RecoverPasswordForAccount([FromBody] UserRecoveryDto userRecovery)
+        [HttpPost("auth/recovery/email")]
+        public async Task<ActionResult> GetRecoveryEmail([FromBody] UserRecoveryDto userRecovery)
         {
-            var newPassword = await userService.SetDefaultPasswordAsync(userRecovery);
-
-            var message = new Message(emailConfig.From, "Password recovery", $"Password for account {userRecovery.Name} has been set to {newPassword}");
-            emailSender.SendEmail(message);
+            var recoveryToken = await authentication.GenerateRecoveryTokenAsync(userRecovery);
+            var emailHtmlBody = $"<a href='https://localhost:7225/store-api/auth/recovery?token={recoveryToken}&password={userRecovery.NewPassword}'>Click here to reset your password</a>";
+            var message = new Message(emailConfig.From, "Password recovery", emailHtmlBody);
+            await emailSender.SendEmail(message);
 
             return NoContent();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("auth/recovery")]
+        public async Task<ActionResult> RecoverUserPassword([FromQuery] string token, [FromQuery] string password)
+        {
+            var userId = Guid.Parse(authentication.ParseToken(token).First(claim => claim.Type == ClaimTypes.Uri).Value);
+
+            var loginToken = await authentication.RecoverAsync(userId, password);
+
+            return Ok(loginToken);
         }
 
         [Authorize(Roles = "Admin")]
