@@ -9,7 +9,7 @@ namespace Users.Infrastructure.Persistence.Repositories
     {
         private readonly AppDbContext appDbContext;
 
-        public UserRepository(AppDbContext dbContext) 
+        public UserRepository(AppDbContext dbContext)
         {
             appDbContext = dbContext;
         }

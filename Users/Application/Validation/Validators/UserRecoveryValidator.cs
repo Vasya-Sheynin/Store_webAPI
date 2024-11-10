@@ -36,7 +36,7 @@ namespace Users.Application.Validation.Validators
             RuleFor(u => u.userRecoveryDto.Email)
                 .Custom((email, context) =>
                 {
-                    var regex = new Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$");
+                    var regex = new Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
                     if (!regex.IsMatch(email))
                     {
                         context.AddFailure("Invalid email format.");
