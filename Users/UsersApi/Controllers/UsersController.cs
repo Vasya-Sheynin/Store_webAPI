@@ -1,16 +1,10 @@
-﻿using CommonModules.Domain.Entities;
-using Infrastructure.Auth;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using System.Security.Principal;
-using System.Threading;
 using Users.Application;
-using Users.Application.ServiceInterfaces;
-using Users.Infrastructure.Email;
+using Users.Application.Validation.Commands;
+using Users.Application.Validation.Queries;
+using Users.Infrastructure.Validation.Commands;
 
 namespace Users.UsersApi.Controllers
 {
@@ -18,24 +12,18 @@ namespace Users.UsersApi.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly IUserService userService;
-        private readonly IAuthentication authentication;
-        private readonly Infrastructure.Email.IEmailSender emailSender;
-        private readonly EmailConfig emailConfig;
+        private readonly ISender sender;
 
-        public UsersController(IUserService service, IAuthentication auth, Infrastructure.Email.IEmailSender sender, EmailConfig config)
+        public UsersController(ISender s)
         {
-            userService = service;
-            authentication = auth;
-            emailSender = sender;
-            emailConfig = config;
+            sender = s;
         }
 
         [AllowAnonymous]
         [HttpPost("auth/login")]
         public async Task<ActionResult> Login([FromBody] UserLoginDto userLogin)
         {
-            var token = await authentication.LoginAsync(userLogin);
+            var token = await sender.Send(new LoginUserCommand(userLogin));
 
             return Ok(token);
         }
@@ -44,7 +32,7 @@ namespace Users.UsersApi.Controllers
         [HttpPost("auth/signup")]
         public async Task<ActionResult> Register([FromBody] UserRegisterDto userRegister)
         {
-            var token = await authentication.RegisterAsync(userRegister);
+            var token = await sender.Send(new RegisterUserCommand(userRegister));
 
             return Ok(token);
         }
@@ -53,10 +41,7 @@ namespace Users.UsersApi.Controllers
         [HttpPost("auth/recovery/email")]
         public async Task<ActionResult> GetRecoveryEmail([FromBody] UserRecoveryDto userRecovery)
         {
-            var recoveryToken = await authentication.GenerateRecoveryTokenAsync(userRecovery);
-            var emailHtmlBody = $"<a href='https://localhost:7225/store-api/auth/recovery?token={recoveryToken}&password={userRecovery.NewPassword}'>Click here to reset your password</a>";
-            var message = new Message(emailConfig.From, "Password recovery", emailHtmlBody);
-            await emailSender.SendEmail(message);
+            await sender.Send(new SendRecoveryEmailCommand(userRecovery));
 
             return NoContent();
         }
@@ -65,9 +50,7 @@ namespace Users.UsersApi.Controllers
         [HttpGet("auth/recovery")]
         public async Task<ActionResult> RecoverUserPassword([FromQuery] string token, [FromQuery] string password)
         {
-            var userId = Guid.Parse(authentication.ParseToken(token).First(claim => claim.Type == ClaimTypes.Uri).Value);
-
-            var loginToken = await authentication.RecoverAsync(userId, password);
+            var loginToken = await sender.Send(new RecoverUserCommand(token, password));
 
             return Ok(loginToken);
         }
@@ -76,7 +59,7 @@ namespace Users.UsersApi.Controllers
         [HttpGet("users")]
         public async Task<ActionResult<IEnumerable<UserDto>>> Get()
         {
-            var users = await userService.GetUsersAsync();
+            var users = await sender.Send(new GetUsersQuery());
 
             return Ok(users);
         }
@@ -85,7 +68,7 @@ namespace Users.UsersApi.Controllers
         [HttpGet("users/{id}")]
         public async Task<ActionResult<UserDto>> GetById([FromRoute] Guid id)
         {
-            var user = await userService.GetUserByIdAsync(id);
+            var user = await sender.Send(new GetUserByIdQuery(id));
 
             return Ok(user);
         }
@@ -94,7 +77,7 @@ namespace Users.UsersApi.Controllers
         [HttpPost("users")]
         public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserDto newUser)
         {
-            var user = await userService.InsertUserAsync(newUser);
+            var user = await sender.Send(new CreateUserCommand(newUser));
 
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
         }
@@ -103,7 +86,7 @@ namespace Users.UsersApi.Controllers
         [HttpPut("users/{id}")]
         public async Task<ActionResult> Update([FromRoute] Guid id, [FromBody] UpdateUserDto newUser)
         {
-            await userService.UpdateUserAsync(id, newUser);
+            await sender.Send(new UpdateUserCommand(id, newUser));
 
             return NoContent();
         }
@@ -112,7 +95,7 @@ namespace Users.UsersApi.Controllers
         [HttpDelete("users/{id}")]
         public async Task<ActionResult> Delete([FromRoute] Guid id)
         {
-            await userService.DeleteUserAsync(id);
+            await sender.Send(new DeleteUserCommand(id));
 
             return NoContent();
         }

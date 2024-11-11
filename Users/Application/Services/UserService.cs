@@ -1,22 +1,17 @@
-﻿using Users.Application.ServiceInterfaces;
-using CommonModules.Domain.Entities;
+﻿using CommonModules.Domain.Entities;
 using CommonModules.Domain.Interfaces;
-using MediatR;
-using Users.Application.Validation.Commands;
 using Users.Application.Exceptions;
-using System.Text;
+using Users.Application.ServiceInterfaces;
 
 namespace Users.Application.Services
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository userRepository;
-        private readonly ISender sender;
 
-        public UserService(IUserRepository repository, ISender s)
+        public UserService(IUserRepository repository)
         {
             userRepository = repository;
-            sender = s;
         }
 
         public async Task DeleteUserAsync(Guid id)
@@ -59,8 +54,6 @@ namespace Users.Application.Services
 
         public async Task<UserDto> InsertUserAsync(CreateUserDto userDto)
         {
-            await sender.Send(new ValidateUserInsertCommand(userDto));
-
             var newUser = new User(
                 Guid.NewGuid(),
                 userDto.Name,
@@ -78,15 +71,17 @@ namespace Users.Application.Services
 
         public async Task UpdateUserAsync(Guid id, UpdateUserDto userDto)
         {
-            await sender.Send(new ValidateUserUpdateCommand(userDto));
-
-            var userById = await userRepository.GetUserByIdAsync(id);
-            if (userById is null)
+            var user = await userRepository.GetUserByIdAsync(id);
+            if (user is null)
             {
                 throw new UserNotFoundException("UserService");
             }
 
-            var user = await userRepository.GetUserByIdAsync(id);
+            var users = (await userRepository.GetUsersAsync()).FirstOrDefault(u => u.Name == userDto.Name);
+            if (users is not null)
+            {
+                throw new UserAlreadyExistsException("UserService");
+            }
 
             user.Id = id;
             user.Name = userDto.Name;

@@ -1,15 +1,10 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Users.Application.Validation.Commands;
 
 namespace Users.Application.Validation.Validators
 {
-    public class UserUpdateValidator : AbstractValidator<ValidateUserUpdateCommand>
+    public class UserUpdateValidator : AbstractValidator<UpdateUserCommand>
     {
         public UserUpdateValidator()
         {

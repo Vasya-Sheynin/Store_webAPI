@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Products.Application;
 using Products.Application.Filters;
-using Products.Application.ServiceInterfaces;
+using Products.Application.Validation.Commands;
+using Products.Application.Validation.Queries;
 using System.Security.Claims;
 
 namespace Products.ProductsApi.Controllers
@@ -11,18 +13,18 @@ namespace Products.ProductsApi.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductService productService;
+        private readonly ISender sender;
 
-        public ProductsController(IProductService service)
+        public ProductsController(ISender s)
         {
-            productService = service;
+            sender = s;
         }
 
-        [Authorize (Roles = "Admin, Standard")]
+        [Authorize(Roles = "Admin, Standard")]
         [HttpGet("products")]
         public async Task<ActionResult<IEnumerable<ProductDto>>> Get([FromQuery] Filter filter)
         {
-            var products = await productService.GetFilteredProductsAsync(filter);
+            var products = await sender.Send(new GetProductsQuery(filter));
 
             return Ok(products);
         }
@@ -31,7 +33,7 @@ namespace Products.ProductsApi.Controllers
         [HttpGet("products/{id}")]
         public async Task<ActionResult<ProductDto>> GetById([FromRoute] Guid id)
         {
-            var product = await productService.GetProductByIdAsync(id);
+            var product = await sender.Send(new GetProductByIdQuery(id));
 
             return Ok(product);
         }
@@ -41,7 +43,7 @@ namespace Products.ProductsApi.Controllers
         public async Task<ActionResult<ProductDto>> Create([FromBody] CreateProductDto newProduct)
         {
             var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Uri).Value);
-            var product = await productService.InsertProductAsync(newProduct, userId);
+            var product = await sender.Send(new CreateProductCommand(newProduct, userId));
 
             return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
         }
@@ -51,7 +53,7 @@ namespace Products.ProductsApi.Controllers
         public async Task<ActionResult> Update([FromRoute] Guid id, [FromBody] UpdateProductDto newProduct)
         {
             var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Uri).Value);
-            await productService.UpdateProductAsync(id, newProduct, userId);
+            await sender.Send(new UpdateProductCommand(id, newProduct, userId));
 
             return NoContent();
         }
@@ -61,7 +63,7 @@ namespace Products.ProductsApi.Controllers
         public async Task<ActionResult> Delete([FromRoute] Guid id)
         {
             var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Uri).Value);
-            await productService.DeleteProductAsync(id, userId);
+            await sender.Send(new DeleteProductCommand(id, userId));
 
             return NoContent();
         }

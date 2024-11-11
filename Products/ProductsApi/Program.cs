@@ -1,12 +1,12 @@
 using CommonModules.Domain.Interfaces;
-using Products.Application.ServiceInterfaces;
-using Products.Application.Services;
-using Products.Infrastructure.Persistence.Repositories;
-using Products.Infrastructure.Auth.Extensions;
-using Products.Infrastructure.Persistence.Extensions;
-using Products.Application.Validation.Extensions;
 using Hellang.Middleware.ProblemDetails;
 using Products.Application.Extensions;
+using Products.Application.ServiceInterfaces;
+using Products.Application.Services;
+using Products.Application.Validation.Extensions;
+using Products.Infrastructure.Auth.Extensions;
+using Products.Infrastructure.Persistence.Extensions;
+using Products.Infrastructure.Persistence.Repositories;
 
 namespace Products.ProductsApi
 {

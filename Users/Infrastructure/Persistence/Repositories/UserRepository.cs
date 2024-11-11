@@ -1,7 +1,7 @@
 ﻿using CommonModules.Domain.Entities;
 using CommonModules.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using CommonModules.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Users.Infrastructure.Persistence.Repositories
 {

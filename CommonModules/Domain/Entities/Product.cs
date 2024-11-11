@@ -49,11 +49,11 @@ namespace CommonModules.Domain.Entities
 
             Product other = (Product)obj;
 
-            return Id == other.Id && 
-                Name == other.Name && 
+            return Id == other.Id &&
+                Name == other.Name &&
                 Description == other.Description &&
                 Price == other.Price &&
-                UserCreatedId == other.UserCreatedId && 
+                UserCreatedId == other.UserCreatedId &&
                 TimeCreated == other.TimeCreated;
         }
     }

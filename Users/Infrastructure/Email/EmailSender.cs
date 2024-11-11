@@ -1,11 +1,5 @@
 ﻿using MailKit.Net.Smtp;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using MimeKit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Users.Infrastructure.Email
 {

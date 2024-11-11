@@ -1,10 +1,4 @@
-﻿using Products.Application;
-using Products.Application.Filters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Products.Application.Filters;
 
 namespace Products.Application.ServiceInterfaces
 {

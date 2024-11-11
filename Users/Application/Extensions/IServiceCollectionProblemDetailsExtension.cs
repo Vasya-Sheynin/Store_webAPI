@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Hellang.Middleware.ProblemDetails;
+﻿using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

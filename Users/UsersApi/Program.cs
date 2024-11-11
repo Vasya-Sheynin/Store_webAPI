@@ -1,15 +1,16 @@
 using CommonModules.Domain.Interfaces;
 using CommonModules.Persistence.Extensions;
+using Hellang.Middleware.ProblemDetails;
 using Infrastructure.Auth;
+using Users.Application.Extensions;
 using Users.Application.ServiceInterfaces;
 using Users.Application.Services;
+using Users.Application.Validation.Extensions;
 using Users.Infrastructure.Auth;
 using Users.Infrastructure.Auth.Extensions;
+using Users.Infrastructure.Email;
 using Users.Infrastructure.Persistence.Repositories;
-using Users.Application.Validation.Extensions;
-using Hellang.Middleware.ProblemDetails;
-using Users.Application.Extensions;
-using Users.Infrastructure.Email; 
+using Users.Infrastructure.Validation.Extensions;
 
 namespace Users.UsersApi
 {
@@ -33,7 +34,8 @@ namespace Users.UsersApi
             builder.Services.AddTransient<IUserRepository, UserRepository>();
             builder.Services.AddTransient<IAuthentication, Authentication>();
 
-            builder.Services.AddValidation();
+            builder.Services.AddApplicationValidation();
+            builder.Services.AddInfrastructureValidation();
 
             builder.Services.AddExceptionHandling(builder.Environment);
 

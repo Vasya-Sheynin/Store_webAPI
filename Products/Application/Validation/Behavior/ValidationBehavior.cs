@@ -1,11 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
 using Products.Application.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Products.Application.Validation.Behavior
 {

@@ -1,13 +1,13 @@
 using CommonModules.Domain.Entities;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Products.Application;
+using ProductsTests.Setup;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
-using ProductsTests.Setup;
-using Products.Application;
 
 namespace ProductsTests
 {

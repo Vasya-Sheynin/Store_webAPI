@@ -1,7 +1,6 @@
 ﻿using CommonModules.Domain.Entities;
 using CommonModules.Domain.Interfaces;
 using Infrastructure.Auth;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,7 +8,6 @@ using System.Security.Claims;
 using System.Text;
 using Users.Application;
 using Users.Application.Exceptions;
-using Users.Application.Validation.Commands;
 
 namespace Users.Infrastructure.Auth
 {
@@ -17,19 +15,15 @@ namespace Users.Infrastructure.Auth
     {
         private readonly IUserRepository userRepository;
         private readonly IConfiguration configManager;
-        private readonly ISender sender;
 
-        public Authentication(IUserRepository repository, IConfiguration config, ISender s)
+        public Authentication(IUserRepository repository, IConfiguration config)
         {
             userRepository = repository;
             configManager = config;
-            sender = s;
         }
 
         public async Task<string> LoginAsync(UserLoginDto userLogin)
         {
-            await sender.Send(new ValidateUserLoginCommand(userLogin));
-
             var user = await Authenticate(userLogin);
             string token = string.Empty;
 
@@ -47,8 +41,6 @@ namespace Users.Infrastructure.Auth
 
         public async Task<string> RegisterAsync(UserRegisterDto userRegister)
         {
-            await sender.Send(new ValidateUserRegisterCommand(userRegister));
-
             var u = (await userRepository.GetUsersAsync()).FirstOrDefault(i => i.Name == userRegister.Name);
             if (u is not null)
             {
@@ -113,8 +105,6 @@ namespace Users.Infrastructure.Auth
 
         public async Task<string> GenerateRecoveryTokenAsync(UserRecoveryDto user)
         {
-            await sender.Send(new ValidateUserRecoveryCommand(user));
-
             var userToRecover = (await userRepository.GetUsersAsync()).FirstOrDefault(u => u.Name == user.Name);
 
             if (userToRecover == null)
